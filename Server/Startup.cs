@@ -10,6 +10,7 @@ using AwqafBlazor.Server.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 
 namespace AwqafBlazor.Server
 {
@@ -33,10 +34,17 @@ namespace AwqafBlazor.Server
             });
 
             services.AddMvc().AddNewtonsoftJson();
+
             services.AddResponseCompression(opts =>
             {
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
                     new[] { "application/octet-stream" });
+            });
+
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "AwqafBlazor API", Version = "v1" });
             });
 
             services.AddDbContextPool<AwqafDbContext>(options =>
@@ -48,10 +56,10 @@ namespace AwqafBlazor.Server
             {
                 mc.AddProfile(new MappingProfile());
             });
+
             var mapper = mappingConfig.CreateMapper();
 
             services.AddSingleton(mapper);
-
             services.AddScoped<IFiscalYearRepository, SqlFiscalYearRepository>();
             services.AddScoped<IAccountRepository, SqlAccountRepository>();
             services.AddScoped<IAccountLedgerRepository, SqlAccountLedgerRepository>();
@@ -73,6 +81,12 @@ namespace AwqafBlazor.Server
             app.UseClientSideBlazorFiles<Client.Startup>();
 
             app.UseRouting();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "AwqafBlazor API");
+            });
 
             app.UseEndpoints(endpoints =>
             {
