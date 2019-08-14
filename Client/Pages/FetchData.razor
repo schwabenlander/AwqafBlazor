@@ -1,12 +1,12 @@
 ﻿@page "/fetchdata"
-@using AwqafBlazor.Shared
+@using AwqafBlazor.Shared.DTOs
 @inject HttpClient Http
 
-<h1>Weather forecast</h1>
+<h1>Fiscal Years</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
-@if (forecasts == null)
+@if (fiscalYearList == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -15,20 +15,20 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
+                <th>ID</th>
+                <th>Year</th>
+                <th>Start Date</th>
+                <th>End Date</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            @foreach (var year in fiscalYearList.FiscalYears)
             {
                 <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
+                    <td>@year.FiscalYearId</td>
+                    <td>@year.YearDescription</td>
+                    <td>@year.StartDate.ToShortDateString()</td>
+                    <td>@year.EndDate.ToShortDateString()</td>
                 </tr>
             }
         </tbody>
@@ -36,11 +36,10 @@ else
 }
 
 @code {
-    WeatherForecast[] forecasts;
+    FiscalYearListDTO fiscalYearList;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetJsonAsync<WeatherForecast[]>("WeatherForecast");
+        fiscalYearList = await Http.GetJsonAsync<FiscalYearListDTO>("api/FiscalYears");
     }
-
 }
