@@ -1,45 +1,11 @@
 ﻿@page "/fetchdata"
 @using AwqafBlazor.Shared.DTOs
+@using AwqafBlazor.Client.Pages.FiscalYearDataGridComponents
 @inject HttpClient Http
 
 <h1>Fiscal Years</h1>
 
-<p>This component demonstrates fetching data from the server.</p>
-
-@if (fiscalYearList == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Year</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var year in fiscalYearList.FiscalYears)
-            {
-                <tr>
-                    <td>@year.FiscalYearId</td>
-                    <td>@year.YearDescription</td>
-                    <td>@year.StartDate.ToShortDateString()</td>
-                    <td>@year.EndDate.ToShortDateString()</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<FiscalYearDataGrid />
 
 @code {
-    FiscalYearListDTO fiscalYearList;
-
-    protected override async Task OnInitializedAsync()
-    {
-        fiscalYearList = await Http.GetJsonAsync<FiscalYearListDTO>("api/FiscalYears");
-    }
 }
