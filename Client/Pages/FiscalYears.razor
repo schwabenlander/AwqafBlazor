@@ -1,11 +1,10 @@
-﻿@page "/fetchdata"
-@using AwqafBlazor.Shared.DTOs
+﻿@page "/fiscalyears"
 @using AwqafBlazor.Client.Pages.FiscalYearDataGridComponents
 @inject HttpClient Http
 
 <h1>Fiscal Years</h1>
 
-<FiscalYearDataGrid />
+<FiscalYearDataGrid Page="1" ItemsPerPage="2" />
 
 @code {
 }

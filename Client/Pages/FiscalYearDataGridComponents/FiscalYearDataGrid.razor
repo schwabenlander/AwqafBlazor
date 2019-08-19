@@ -1,13 +1,13 @@
 ﻿@using AwqafBlazor.Shared.DTOs
 @inject HttpClient Http
 
-@if (fiscalYearList == null)
+@if (YearList == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <p>Total Items: @totalItems</p>
+    <p>Total Items: @TotalItems</p>
     <table class="table">
         <thead>
             <tr>
@@ -18,7 +18,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var year in fiscalYearList.FiscalYears)
+            @foreach (var year in YearList.FiscalYears)
             {
                 <tr>
                     <td>@year.FiscalYearId</td>
@@ -29,50 +29,75 @@ else
             }
         </tbody>
     </table>
-    <p>Page @currentPage of @totalPages.</p>
+    <p>Page @Page of @TotalPages.</p>
 
-    <button class="btn btn-outline-primary" @onclick="PreviousPageClick">&lt; Previous Page</button>
-    <button class="btn btn-outline-primary" @onclick="NextPageClick">Next Page &gt;</button>
+    <ul class="pagination">
+        <li><button type="button" @onclick="PreviousPageClick" class="btn">&laquo;</button></li>
+        @for (var i = 1; i <= TotalPages; i++)
+        {
+            var currentIndex = i;
+            @if (i == Page)
+            {
+                <li><span class="btn btn-primary">@i</span></li>
+            }
+            else
+            {
+                <li><button type="button" class="btn" @onclick="@(() => PageNumberClick(currentIndex))">@i</button></li>
+            }
+        }
+        <li><button type="button" @onclick="NextPageClick" class="btn">&raquo;</button></li>
+    </ul>
 }
 
 @code {
-    FiscalYearListDTO fiscalYearList;
+    protected FiscalYearListDTO YearList;
 
-    int currentPage = 1;
-    int itemsPerPage = 2;
-    int totalItems;
-    int totalPages;
+    [Parameter]
+    public int Page { get; set; } = 1;
+
+    [Parameter]
+    public int ItemsPerPage { get; set; } = 20;
+
+    int TotalItems { get; set; }
+    int TotalPages { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await GetFiscalYearData();
-        currentPage = fiscalYearList.CurrentPage;
-        totalPages = fiscalYearList.TotalPages;
-        totalItems = fiscalYearList.TotalItems;
+        Page = YearList.CurrentPage;
+        TotalPages = YearList.TotalPages;
+        TotalItems = YearList.TotalItems;
     }
 
     protected async Task GetFiscalYearData()
     {
-        fiscalYearList = await Http.GetJsonAsync<FiscalYearListDTO>($"api/FiscalYears?page={currentPage}&itemsPerPage={itemsPerPage}");
+        YearList = await Http.GetJsonAsync<FiscalYearListDTO>($"api/FiscalYears?page={Page}&itemsPerPage={ItemsPerPage}");
     }
 
     protected async Task NextPageClick()
     {
-        if (currentPage < totalPages)
+        if (Page < TotalPages)
         {
-            currentPage++;
+            Page++;
             await GetFiscalYearData();
-            this.StateHasChanged();
+            StateHasChanged();
         }
     }
 
     protected async Task PreviousPageClick()
     {
-        if (currentPage > 1)
+        if (Page > 1)
         {
-            currentPage--;
+            Page--;
             await GetFiscalYearData();
-            this.StateHasChanged();
+            StateHasChanged();
         }
+    }
+
+    protected async Task PageNumberClick(int pageNumber)
+    {
+        Page = pageNumber;
+        await GetFiscalYearData();
+        StateHasChanged();
     }
 }
