@@ -1,7 +1,7 @@
 ﻿@using AwqafBlazor.Shared.DTOs
 @inject HttpClient Http
 
-@if (AccountList == null)
+@if (AccountLedgersList == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -11,24 +11,21 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Account</th>
-                <th>Level 1-4</th>
+                <th>Fiscal Year ID</th>
+                <th>Account ID</th>
+                <th>Ledger #</th>
+                <th>Ledger Name</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var account in AccountList.Accounts)
+            @foreach (var ledger in AccountLedgersList.AccountLedgers)
             {
                 <tr>
-                    <td>@account.AccountId</td>
-                    <td>@account.AccountName</td>
-                    <td>
-                        @account.Level1 - 
-                        @account.Level2 - 
-                        @account.Level3 - 
-                        @account.Level4
-                    </td>
+                    <td>@ledger.FiscalYearId</td>
+                    <td>@ledger.AccountId</td>
+                    <td>@ledger.LedgerNo</td>
+                    <td>@ledger.Ledger</td>
                     <td><button class="btn btn-outline-primary">Details</button></td>
                 </tr>
             }
@@ -55,7 +52,7 @@ else
 }
 
 @code {
-    protected AccountListDTO AccountList;
+    protected AccountLedgerListDTO AccountLedgersList;
 
     [Parameter]
     public int Page { get; set; } = 1;
@@ -68,15 +65,15 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await GetAccountData();
-        Page = AccountList.CurrentPage;
-        TotalPages = AccountList.TotalPages;
-        TotalItems = AccountList.TotalItems;
+        await GetAccountLedgersData();
+        Page = AccountLedgersList.CurrentPage;
+        TotalPages = AccountLedgersList.TotalPages;
+        TotalItems = AccountLedgersList.TotalItems;
     }
 
-    protected async Task GetAccountData()
+    protected async Task GetAccountLedgersData()
     {
-        AccountList = await Http.GetJsonAsync<AccountListDTO>($"api/Accounts?page={Page}&itemsPerPage={ItemsPerPage}");
+        AccountLedgersList = await Http.GetJsonAsync<AccountLedgerListDTO>($"api/AccountLedgers?page={Page}&itemsPerPage={ItemsPerPage}");
     }
 
     protected async Task NextPageClick()
@@ -84,7 +81,7 @@ else
         if (Page < TotalPages)
         {
             Page++;
-            await GetAccountData();
+            await GetAccountLedgersData();
             StateHasChanged();
         }
     }
@@ -94,7 +91,7 @@ else
         if (Page > 1)
         {
             Page--;
-            await GetAccountData();
+            await GetAccountLedgersData();
             StateHasChanged();
         }
     }
@@ -102,7 +99,7 @@ else
     protected async Task PageNumberClick(int pageNumber)
     {
         Page = pageNumber;
-        await GetAccountData();
+        await GetAccountLedgersData();
         StateHasChanged();
     }
 }

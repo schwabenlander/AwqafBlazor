@@ -16,5 +16,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Shared\AwqafBlazor.Shared.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Pages\VoucherComponents\" />
+  </ItemGroup>
 
 </Project>

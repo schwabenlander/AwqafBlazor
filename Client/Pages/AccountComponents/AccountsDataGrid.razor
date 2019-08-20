@@ -1,0 +1,108 @@
+﻿@using AwqafBlazor.Shared.DTOs
+@inject HttpClient Http
+
+@if (AccountList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <p>Total Items: @TotalItems</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Account</th>
+                <th>Levels 1-4</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var account in AccountList.Accounts)
+            {
+                <tr>
+                    <td>@account.AccountId</td>
+                    <td>@account.AccountName</td>
+                    <td>
+                        @account.Level1 - 
+                        @account.Level2 - 
+                        @account.Level3 - 
+                        @account.Level4
+                    </td>
+                    <td><button class="btn btn-outline-primary">Details</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <p>Page @Page of @TotalPages.</p>
+
+    <ul class="pagination">
+        <li><button type="button" @onclick="PreviousPageClick" class="btn">&laquo;</button></li>
+        @for (var i = 1; i <= TotalPages; i++)
+        {
+            var currentIndex = i;
+            @if (i == Page)
+            {
+                <li><span class="btn btn-primary">@i</span></li>
+            }
+            else
+            {
+                <li><button type="button" class="btn" @onclick="@(() => PageNumberClick(currentIndex))">@i</button></li>
+            }
+        }
+        <li><button type="button" @onclick="NextPageClick" class="btn">&raquo;</button></li>
+    </ul>
+}
+
+@code {
+    protected AccountListDTO AccountList;
+
+    [Parameter]
+    public int Page { get; set; } = 1;
+
+    [Parameter]
+    public int ItemsPerPage { get; set; } = 20;
+
+    int TotalItems { get; set; }
+    int TotalPages { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAccountData();
+        Page = AccountList.CurrentPage;
+        TotalPages = AccountList.TotalPages;
+        TotalItems = AccountList.TotalItems;
+    }
+
+    protected async Task GetAccountData()
+    {
+        AccountList = await Http.GetJsonAsync<AccountListDTO>($"api/Accounts?page={Page}&itemsPerPage={ItemsPerPage}");
+    }
+
+    protected async Task NextPageClick()
+    {
+        if (Page < TotalPages)
+        {
+            Page++;
+            await GetAccountData();
+            StateHasChanged();
+        }
+    }
+
+    protected async Task PreviousPageClick()
+    {
+        if (Page > 1)
+        {
+            Page--;
+            await GetAccountData();
+            StateHasChanged();
+        }
+    }
+
+    protected async Task PageNumberClick(int pageNumber)
+    {
+        Page = pageNumber;
+        await GetAccountData();
+        StateHasChanged();
+    }
+}
