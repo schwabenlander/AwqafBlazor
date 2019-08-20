@@ -1,0 +1,52 @@
+﻿@page "/fiscalyears/{fiscalYearId:int}"
+@using AwqafBlazor.Shared.DTOs
+@inject HttpClient Http
+
+@if (Year == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h3>Fiscal Year: @Year.YearDescription</h3>
+    <div>
+        <span>ID: </span>
+        <span>@Year.FiscalYearId</span>
+    </div>
+    <div>
+        <span>Start Date: </span>
+        <span>@Year.StartDate.ToShortDateString()</span>
+    </div>
+    <div>
+        <span>End Date: </span>
+        <span>@Year.EndDate.ToShortDateString()</span>
+    </div>
+    <div>
+        <span>Current? </span>
+        <span>@(Year.IsCurrent ? "Yes" : "No")</span>
+    </div>
+    <div>
+        <span>Open? </span>
+        <span>@(Year.IsOpen ? "Yes" : "No")</span>
+    </div>
+
+    <button class="btn btn-primary">Edit</button> 
+    <button class="btn btn-outline-primary">Delete</button>
+}
+
+@code{
+    [Parameter]
+    public int FiscalYearId { get; set; }
+
+    protected FiscalYearDTO Year { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetFiscalYear(FiscalYearId);
+    }
+
+    protected async Task GetFiscalYear(int id)
+    {
+        Year = await Http.GetJsonAsync<FiscalYearDTO>($"api/FiscalYears/{id}");
+    }
+}
