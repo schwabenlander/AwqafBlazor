@@ -1,7 +1,7 @@
 ﻿@using AwqafBlazor.Shared.DTOs
 @inject HttpClient Http
 
-@if (YearList == null)
+@if (VouchersList == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -12,20 +12,20 @@ else
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Year</th>
-                <th>Start Date</th>
-                <th>End Date</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Total</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var year in YearList.FiscalYears)
+            @foreach (var voucher in VouchersList.Vouchers)
             {
                 <tr>
-                    <td>@year.FiscalYearId</td>
-                    <td>@year.YearDescription</td>
-                    <td>@year.StartDate.ToShortDateString()</td>
-                    <td>@year.EndDate.ToShortDateString()</td>
+                    <td>@voucher.VoucherId</td>
+                    <td>@(voucher.VoucherDate.HasValue ? voucher.VoucherDate.Value.ToShortDateString() : "N/A")</td>
+                    <td>@voucher.VoucherStatusId</td>
+                    <td>@(voucher.VoucherTotal.HasValue ? voucher.VoucherTotal.Value.ToString("C") : "N/A")</td>
                     <td><button class="btn btn-outline-primary">Details</button></td>
                 </tr>
             }
@@ -52,7 +52,7 @@ else
 }
 
 @code {
-    protected FiscalYearListDTO YearList;
+    protected VoucherListDTO VouchersList;
 
     [Parameter]
     public int Page { get; set; } = 1;
@@ -65,15 +65,15 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await GetFiscalYearData();
-        Page = YearList.CurrentPage;
-        TotalPages = YearList.TotalPages;
-        TotalItems = YearList.TotalItems;
+        await GetVoucherData();
+        Page = VouchersList.CurrentPage;
+        TotalPages = VouchersList.TotalPages;
+        TotalItems = VouchersList.TotalItems;
     }
 
-    protected async Task GetFiscalYearData()
+    protected async Task GetVoucherData()
     {
-        YearList = await Http.GetJsonAsync<FiscalYearListDTO>($"api/FiscalYears?page={Page}&itemsPerPage={ItemsPerPage}");
+        VouchersList = await Http.GetJsonAsync<VoucherListDTO>($"api/Vouchers?page={Page}&itemsPerPage={ItemsPerPage}");
     }
 
     protected async Task NextPageClick()
@@ -81,7 +81,7 @@ else
         if (Page < TotalPages)
         {
             Page++;
-            await GetFiscalYearData();
+            await GetVoucherData();
             StateHasChanged();
         }
     }
@@ -91,7 +91,7 @@ else
         if (Page > 1)
         {
             Page--;
-            await GetFiscalYearData();
+            await GetVoucherData();
             StateHasChanged();
         }
     }
@@ -99,7 +99,7 @@ else
     protected async Task PageNumberClick(int pageNumber)
     {
         Page = pageNumber;
-        await GetFiscalYearData();
+        await GetVoucherData();
         StateHasChanged();
     }
 }
